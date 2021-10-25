@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:payflow/shared/models/boleto_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InsertBoletoController {
   final formKey = GlobalKey<FormState>();
@@ -27,10 +28,18 @@ class InsertBoletoController {
     );
   }
 
-  void cadastrarBoleto() {
+  Future<void> saveBoleto() async {
+    final instance = await SharedPreferences.getInstance();
+    final boletos = instance.getStringList("boletos") ?? <String>[];
+    boletos.add(model.toJson());
+    await instance.setStringList("boletos", boletos);
+    return;
+  }
+
+  Future<void> cadastrarBoleto() async {
     final form = formKey.currentState;
     if (form!.validate()) {
-      print(model);
+      return await saveBoleto();
     }
   }
 }
